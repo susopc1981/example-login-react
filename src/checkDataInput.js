@@ -9,3 +9,5 @@ export function checkTlf(data) {
 
   return dataTrue;
 }
+
+export function checkDataInput(a, b) {}

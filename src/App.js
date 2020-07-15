@@ -4,24 +4,26 @@ import { InputSelect } from "./components/InputSelect";
 import { InputText } from "./components/InputText";
 import { InputGender } from "./components/InputGender";
 import { SubmitButton } from "./components/SubmitButton";
-import { checkTlf } from "./checkDataInput";
+import { checkTlf, checkDataInput } from "./checkDataInput";
+import { loadDays } from "./loadDays";
 import { calculateDataSelect } from "./checkData";
 
 function App() {
-  const date = calculateDataSelect();
+  const [date, setDate] = useState(calculateDataSelect());
   const [errorMessage, setErrorMessage] = useState();
   const [name, setName] = useState("");
   const [errorName, setErrorName] = useState("asd");
   const [surname, setSurname] = useState("");
   const [errorSurname, setErrorSurname] = useState("asd");
   const [gender, setGender] = useState("male");
-  const [year, setYear] = useState("");
-  const [month, setMonth] = useState("");
-  const [day, setDay] = useState("");
+  const [year, setYear] = useState("1951");
+  const [month, setMonth] = useState("1");
+  const [day, setDay] = useState("1");
   const [finalDate, setFinalDate] = useState("");
   const [tlf, setTlf] = useState("");
   const [errorTlf, setErrorTlf] = useState("asd");
   const [mail, setMail] = useState("");
+  const [errorMail, setErrorMail] = useState("asd");
   useEffect(() => {
     console.log(year, month, day);
   }, [year, month, day]);
@@ -54,10 +56,35 @@ function App() {
   function HandleOnChangeGender(event) {
     setGender(event.target.value);
   }
-  function HandleOnChangeBirth(event) {}
+  function HandleOnChangeYear(event) {
+    setYear(event.target.value);
+    console.log(year);
+    const finalDays = loadDays(
+      Number(month),
+      Number(event.target.value),
+      setDay
+    );
+    setDate({ ...date, days: finalDays });
+  }
+
+  function HandleOnChangeMonth(event) {
+    setMonth(event.target.value);
+    console.log(month);
+    const finalDays = loadDays(
+      Number(event.target.value),
+      Number(year),
+      setDay
+    );
+    console.log(finalDays);
+    setDate({ ...date, days: finalDays });
+  }
+  function HandleOnSubmit(event) {
+    event.preventDefault();
+  }
+
   return (
     <div className="App">
-      <form>
+      <form onSubmit={HandleOnSubmit}>
         <div>
           <label>Nombre</label>
           <InputText
@@ -65,6 +92,7 @@ function App() {
             name="nombre"
             placeHolder="Escirbe el nombre"
             onChange={HandleOnChangeName}
+            data={errorName}
           />
           {name.length > 0 && errorName.length > 3 ? <p>{errorName}</p> : <></>}
         </div>
@@ -75,6 +103,7 @@ function App() {
             name="apellidos"
             placeHolder="Escirbe los apellidos"
             onChange={HandleOnChangeSurname}
+            data={errorSurname}
           />
           {surname.length > 0 && errorSurname.length > 3 ? (
             <p>{errorSurname}</p>
@@ -86,18 +115,19 @@ function App() {
           <label>Fecha de nacimiento</label>
           <InputSelect
             data={date.days}
-            onChange={HandleOnChangeBirth}
+            // onChange={HandleOnChangeBirth}
             value={day}
           />
           <InputSelect
             data={date.monthName}
-            onChange={HandleOnChangeBirth}
+            onChange={HandleOnChangeMonth}
             value={month}
           />
           <InputSelect
             data={date.years}
-            onChange={HandleOnChangeBirth}
+            onChange={HandleOnChangeYear}
             value={year}
+            option="year"
           />
         </div>
         <div>
@@ -125,6 +155,7 @@ function App() {
             name="mail"
             placeHolder="email@example.es"
             onChange={HandleOnChangeMail}
+            data={errorMail}
           />
         </div>
         <div>
@@ -134,6 +165,7 @@ function App() {
             name="tlf"
             placeHolder="Introduce tu teléfono"
             onChange={HandleOnChangeTlf}
+            data={errorTlf}
           />
           {errorTlf !== "" && tlf.length > 0 ? <p>{errorTlf}</p> : <></>}
         </div>
